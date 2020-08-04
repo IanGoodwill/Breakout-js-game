@@ -14,15 +14,113 @@
 
 <body>
 
-<canvas id="myCanvas" width="480" height="320"></canvas>
+<canvas id="myCanvas" width="600" height="400"></canvas>
 
 <script>
-	// JavaScript code goes here
 
     var canvas = document.getElementById("myCanvas");
 
     var ctx = canvas.getContext("2d");
+
+    // ball start position
+    var x = canvas.width/2;
+    var y = canvas.height-30;
+
+    // values for ball movement
+    var dx = 2;
+    var dy = -2;
+
+    // defining space occupied by ball for collision detection
+    var ballRadius = 10;
+
+    // Defining a paddle to hit the ball
+    var paddleHeight = 10;
+    var paddleWidth = 75;
+    var paddleX = (canvas.width-paddleWidth) / 2;
+
+    // Allowing the user to control the paddle
+    var rightPressed = false;
+    var leftPressed = false;
     
+    function drawBall() {
+        ctx.beginPath();
+        ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+        ctx.fillStyle = "#0088B3";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function drawPaddle() {
+        ctx.beginPath();
+        ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
+        ctx.fillStyle = "#F58220";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function draw() { // drawing code
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // refreshes the canvas and prevents ball from leaving trail
+        drawBall();
+        drawPaddle();
+        x += dx;
+        y += dy;
+
+        if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {  // collision detection for left & right
+            dx = -dx;
+        }
+
+        if(y + dy < ballRadius) {
+            dy = -dy;
+        } else if(y + dy > canvas.height-ballRadius) {
+        if(x > paddleX && x < paddleX + paddleWidth) {
+            dy = -dy;
+        }
+        else {
+            alert("GAME OVER");
+            document.location.reload();
+            clearInterval(interval); // Needed for google chrome
+            }
+    }
+
+        if(rightPressed) {
+            paddleX += 7;
+
+        if (paddleX + paddleWidth > canvas.width){
+            paddleX = canvas.width - paddleWidth;
+        }
+    }
+    else if(leftPressed) {
+        paddleX -= 7;
+        if (paddleX < 0){
+            paddleX = 0;
+        }
+    }
+    }
+    
+    //  To listen for key presses, we will set up two event listeners
+    document.addEventListener("keydown", keyDownHandler, false);
+    document.addEventListener("keyup", keyUpHandler, false);
+
+    function keyDownHandler(e) {
+        if(e.key == "Right" || e.key == "ArrowRight") {
+            rightPressed = true;
+        }
+        else if(e.key == "Left" || e.key == "ArrowLeft") {
+            leftPressed = true;
+        }
+    }
+
+    function keyUpHandler(e) {
+        if(e.key == "Right" || e.key == "ArrowRight") {
+            rightPressed = false;
+        }
+        else if(e.key == "Left" || e.key == "ArrowLeft") {
+            leftPressed = false;
+        }
+    }
+
+    var interval = setInterval(draw, 10); //  function will be called every 10 milliseconds forever, or until we stop it
+
 </script>
 
 </body>
